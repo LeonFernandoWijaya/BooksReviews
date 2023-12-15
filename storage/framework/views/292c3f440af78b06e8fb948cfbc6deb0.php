@@ -3,9 +3,27 @@
 
     <form method="GET" action="<?php echo e(route('books.index')); ?>" class="mb-4 flex items-center space-x-2">
         <input type="text" name="title" placeholder="Search by title" value="<?php echo e(request('title')); ?>" class="input h-10" />
+        <input type="hidden" name="filter" value="<?php echo e(request('filter')); ?>">
         <button type="submit" class="btn h-10">Search</button>
         <a href="<?php echo e(route('books.index')); ?>" class="btn h-10">Clear</a>
     </form>
+
+    <div class="filter-container mb-4 flex">
+        <?php
+            $filters = [
+                '' => 'Latest',
+                'popular_last_month' => 'Popular Last Month',
+                'popular_last_6months' => 'Popular Last 6 Months',
+                'highest_rated_last_month' => 'Highest Rated Last Month',
+                'highest_rated_last_6months' => 'Highest Rated Last 6 Months',
+            ];
+        ?>
+
+        <?php $__currentLoopData = $filters; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(route('books.index', [...request()->query(), 'filter' => $key])); ?>"
+                class="<?php echo e(request('filter') === $key || (request('filter') === null && $key === '') ? 'filter-item-active' : 'filter-item'); ?>"><?php echo e($label); ?></a>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </div>
 
     <ul>
         <?php $__empty_1 = true; $__currentLoopData = $books; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $book): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
@@ -18,8 +36,21 @@
                         </div>
                         <div>
                             <div class="book-rating">
-                                <?php echo e(number_format($book->reviews_avg_rating, 1)); ?>
-
+                                <?php if (isset($component)) { $__componentOriginal39f2763c88a2b6449e1e2b6e6a25d4ae = $component; } ?>
+<?php $component = App\View\Components\StarRating::resolve(['rating' => $book->reviews_avg_rating] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('star-rating'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\StarRating::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal39f2763c88a2b6449e1e2b6e6a25d4ae)): ?>
+<?php $component = $__componentOriginal39f2763c88a2b6449e1e2b6e6a25d4ae; ?>
+<?php unset($__componentOriginal39f2763c88a2b6449e1e2b6e6a25d4ae); ?>
+<?php endif; ?>
                             </div>
                             <div class="book-review-count">
                                 out of <?php echo e($book->reviews_count); ?> <?php echo e(Str::plural('review', $book->reviews_count)); ?>
